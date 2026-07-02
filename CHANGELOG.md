@@ -4,6 +4,13 @@ All notable changes to ShuttleX are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.2] - 2026-06-29
+
+### Fixed
+- The hotkey recorder accepted key combinations without a real modifier — recording e.g. a plain `K` would have made every "K" typed in *any* app open ShuttleX. A shortcut now requires ⌘, ⌥ or ⌃.
+- Typing in the **Remote URL** or **Default user** fields no longer reloads on every keystroke — while typing a URL this fired network requests against partial hostnames. Reload now happens on Enter, via the Reload button, and on every menu open as before.
+- The remote inventory is no longer re-fetched on every menu open: fetches of the same URL are throttled to once per minute (the cached list still shows instantly). The **Reload** button and editing the URL bypass the throttle.
+
 ## [1.14.1] - 2026-06-28
 
 ### Fixed
@@ -206,6 +213,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 ### Added
 - Initial release. A menu-bar SSH launcher built with SwiftUI (`MenuBarExtra`), pure arm64 for Apple Silicon. Hosts from `~/.ssh/config` or a JSON file; choose your terminal (Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm); open in a new window, tab, or split.
 
+[1.14.2]: https://github.com/DasDuo/ShuttleX/compare/v1.14.1...v1.14.2
 [1.14.1]: https://github.com/DasDuo/ShuttleX/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DasDuo/ShuttleX/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/DasDuo/ShuttleX/compare/v1.13.0...v1.13.1

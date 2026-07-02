@@ -69,6 +69,7 @@ struct SettingsView: View {
                     }
                     LabeledContent("Hosts found", value: "\(state.hostCount)")
                     TextField("Default user", text: $state.defaultUser, prompt: Text("none"))
+                        .onSubmit { state.reload() }
                     Text("Used for servers that don't set their own user. You can override it per server in the editor.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
@@ -103,16 +104,18 @@ struct SettingsView: View {
 
                 case .remoteJSON:
                     TextField("Remote URL", text: $state.remoteURL, prompt: Text("https://…"))
+                        .onSubmit { state.reload(force: true) }
                     LabeledContent("Hosts found", value: "\(state.hostCount)")
                     if let updated = state.remoteLastUpdated {
                         LabeledContent("Last updated", value: updated.formatted(date: .abbreviated, time: .shortened))
                     }
                     TextField("Default user", text: $state.defaultUser, prompt: Text("none"))
+                        .onSubmit { state.reload() }
                     HStack {
                         Button("Edit servers…") { showRemoteEditor = true }
                             .buttonStyle(.borderedProminent)
                         Spacer()
-                        Button("Reload") { state.reload() }
+                        Button("Reload") { state.reload(force: true) }
                     }
                     Text("Loads a read-only server list from an https:// URL — a shared “single source of truth” for a team. Only inventory is used (groups, names, host, port); any commands in the file are ignored for safety. The login user comes from the default user above, or a per-server user you set locally (kept across reloads).")
                         .font(.callout)

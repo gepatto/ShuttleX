@@ -28,19 +28,17 @@ final class AppState {
 
     /// A default SSH user applied to servers that don't specify their own
     /// (JSON / remote source). Empty = no default. Per-server users override it.
+    /// No reload here — the Settings field is bound per keystroke; reloading is
+    /// triggered on submit (and every menu open reloads anyway).
     var defaultUser: String {
-        didSet {
-            UserDefaults.standard.set(defaultUser, forKey: "defaultUser")
-            reload()
-        }
+        didSet { UserDefaults.standard.set(defaultUser, forKey: "defaultUser") }
     }
 
     /// HTTPS URL of a remote server inventory (used by the `.remoteJSON` source).
+    /// No reload here — otherwise every keystroke while typing the URL would
+    /// fire a network request against a partial hostname.
     var remoteURL: String {
-        didSet {
-            UserDefaults.standard.set(remoteURL, forKey: "remoteURL")
-            if source == .remoteJSON { reload() }
-        }
+        didSet { UserDefaults.standard.set(remoteURL, forKey: "remoteURL") }
     }
 
     /// When the remote inventory was last fetched successfully.
@@ -131,7 +129,9 @@ final class AppState {
         }
     }
 
-    func reload() {
+    /// Re-reads the current source. `force` bypasses the remote-fetch throttle
+    /// (used by the manual Reload button and after editing the URL).
+    func reload(force: Bool = false) {
         lastError = nil
         switch source {
         case .sshConfig:
@@ -161,15 +161,22 @@ final class AppState {
                 lastError = "Invalid JSON file: \(error.localizedDescription)"
             }
         case .remoteJSON:
-            reloadRemote()
+            reloadRemote(force: force)
         }
     }
+
+    /// Throttle for the remote fetch: the menu reloads on every open, and the
+    /// inventory doesn't change that fast — skip the network (cache still shows)
+    /// when the same URL was fetched recently.
+    private var lastRemoteFetchURL: String?
+    private var lastRemoteFetchAt: Date?
+    private static let remoteFetchInterval: TimeInterval = 60
 
     /// Loads the remote inventory: shows the local cache immediately (so the
     /// menu works offline), then fetches a fresh copy in the background. The
     /// JSON is decoded with `allowCommands: false` — a remote source provides
     /// inventory only and can never inject commands.
-    private func reloadRemote() {
+    private func reloadRemote(force: Bool = false) {
         let urlString = remoteURL.trimmingCharacters(in: .whitespaces)
         guard !urlString.isEmpty else {
             groups = []
@@ -186,6 +193,14 @@ final class AppState {
            let cachedGroups = try? JSONHostStore.decode(cached, defaultUser: defaultUser, allowCommands: false, userOverrides: overrides, favoriteKeys: favoriteKeys) {
             groups = cachedGroups
         }
+
+        // Throttled: same URL fetched recently → cache is fresh enough.
+        if !force, lastRemoteFetchURL == urlString,
+           let last = lastRemoteFetchAt, Date().timeIntervalSince(last) < Self.remoteFetchInterval {
+            return
+        }
+        lastRemoteFetchURL = urlString
+        lastRemoteFetchAt = Date()
 
         let defaultUser = self.defaultUser
         Task {

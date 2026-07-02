@@ -283,6 +283,17 @@ private func makeTempDir() -> URL {
     #expect(HostFiltering.filter(groups, query: "prod", includeTags: false).isEmpty)
 }
 
+@Test func hotkeyRequiresRealModifiers() {
+    // Plain keys (or shift-only) must not become a global hotkey — they'd fire
+    // on normal typing in any app. ⌘/⌥/⌃ qualify.
+    #expect(!HotkeyRecorder.hasRequiredModifiers([]))
+    #expect(!HotkeyRecorder.hasRequiredModifiers([.shift]))
+    #expect(HotkeyRecorder.hasRequiredModifiers([.command]))
+    #expect(HotkeyRecorder.hasRequiredModifiers([.option]))
+    #expect(HotkeyRecorder.hasRequiredModifiers([.control]))
+    #expect(HotkeyRecorder.hasRequiredModifiers([.command, .shift]))
+}
+
 // MARK: - Search filtering
 
 @Test func searchMatchesGroupNameOrHost() {

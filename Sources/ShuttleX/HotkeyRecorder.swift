@@ -23,7 +23,7 @@ struct HotkeyRecorder: View {
                     .frame(minWidth: 150)
                     .contentShape(Rectangle())
             }
-            .help(recording ? "Press a key combination, or Esc to cancel" : "Click to record a shortcut")
+            .help(recording ? "Press a combination with ⌘, ⌥ or ⌃ — Esc cancels" : "Click to record a shortcut")
 
             if shortcut != nil, !recording {
                 Button(action: clear) {
@@ -44,11 +44,20 @@ struct HotkeyRecorder: View {
 
     private func toggle() { recording ? stop() : start() }
 
+    /// A global hotkey must carry ⌘/⌥/⌃ — otherwise a plain key (e.g. `K`)
+    /// would fire system-wide on normal typing in any app.
+    static func hasRequiredModifiers(_ flags: NSEvent.ModifierFlags) -> Bool {
+        !flags.intersection([.command, .option, .control]).isEmpty
+    }
+
     private func start() {
         recording = true
         monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown]) { event in
             if event.keyCode == 53 { stop(); return nil }        // Esc cancels
             if event.keyCode == 51 { clear(); stop(); return nil } // Delete clears
+            guard Self.hasRequiredModifiers(event.modifierFlags) else {
+                return nil // ignore modifier-less keys; keep recording
+            }
             if let new = KeyboardShortcuts.Shortcut(event: event) {
                 KeyboardShortcuts.setShortcut(new, for: name)
                 shortcut = new
