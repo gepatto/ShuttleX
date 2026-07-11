@@ -4,6 +4,12 @@ All notable changes to ShuttleX are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.3] - 2026-06-29
+
+### Fixed
+- **↑/↓ now work immediately** when the menu opens — no need to type first. Arrow-browsing steps through all servers accordion-style: only the group holding the selection is expanded, the previous one collapses. Searching still expands everything, and Enter on a fresh, collapsed menu deliberately does nothing.
+- **Esc (or clicking elsewhere) now hands focus back** to the app you came from. Previously ShuttleX stayed the active app with no window after closing the hotkey panel, so your next keystrokes went nowhere until you clicked. An open Settings window is not affected.
+
 ## [1.14.2] - 2026-06-29
 
 ### Fixed
@@ -213,6 +219,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 ### Added
 - Initial release. A menu-bar SSH launcher built with SwiftUI (`MenuBarExtra`), pure arm64 for Apple Silicon. Hosts from `~/.ssh/config` or a JSON file; choose your terminal (Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm); open in a new window, tab, or split.
 
+[1.14.3]: https://github.com/DasDuo/ShuttleX/compare/v1.14.2...v1.14.3
 [1.14.2]: https://github.com/DasDuo/ShuttleX/compare/v1.14.1...v1.14.2
 [1.14.1]: https://github.com/DasDuo/ShuttleX/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/DasDuo/ShuttleX/compare/v1.13.1...v1.14.0

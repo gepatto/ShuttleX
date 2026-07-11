@@ -32,6 +32,9 @@ final class PanelController {
 
     /// Opens the Settings window. Set by the app delegate, which owns the window.
     var onOpenSettings: () -> Void = {}
+    /// Whether another of our windows (Settings) is visible — hiding the panel
+    /// must not yank the whole app to the background then. Set by the delegate.
+    var hasVisibleAuxWindow: () -> Bool = { false }
 
     init(state: AppState) {
         self.state = state
@@ -117,9 +120,16 @@ final class PanelController {
         installOutsideClickMonitor()
     }
 
-    func hide() {
+    /// Closes the panel. By default it also hands focus back to the previously
+    /// active app (`NSApp.hide`) — without this, ShuttleX stays the active app
+    /// with no window and keystrokes go nowhere (e.g. hotkey → Esc → typing).
+    /// `returnFocus: false` is used when we're about to show our own Settings.
+    func hide(returnFocus: Bool = true) {
         removeOutsideClickMonitor()
         panel.orderOut(nil)
+        if returnFocus, !hasVisibleAuxWindow() {
+            NSApp.hide(nil)
+        }
     }
 
     func openSettings() {

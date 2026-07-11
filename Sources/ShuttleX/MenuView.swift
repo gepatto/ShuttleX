@@ -136,7 +136,7 @@ struct MenuView: View {
                 .onSubmit(connectSelected)
                 .onKeyPress(.upArrow) { moveSelection(-1); return .handled }
                 .onKeyPress(.downArrow) { moveSelection(1); return .handled }
-                .onChange(of: query) { selectedID = visibleHosts.first?.id }
+                .onChange(of: query) { selectedID = query.isEmpty ? nil : navigableHosts.first?.id }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -309,11 +309,13 @@ struct MenuView: View {
 
     // MARK: - Keyboard navigation
 
-    /// Hosts the ↑/↓ keys step through: every visible host in display order, deduped.
-    private var visibleHosts: [SSHHost] {
+    /// Hosts the ↑/↓ keys step through: every host in display order, deduped —
+    /// independent of what's expanded. While browsing (no search), the expansion
+    /// follows the selection accordion-style: only the active group is open.
+    private var navigableHosts: [SSHHost] {
         var seen = Set<SSHHost.ID>()
         var result: [SSHHost] = []
-        for group in displayGroups where isExpanded(group) {
+        for group in displayGroups {
             for host in group.hosts where seen.insert(host.id).inserted {
                 result.append(host)
             }
@@ -322,17 +324,39 @@ struct MenuView: View {
     }
 
     private func moveSelection(_ delta: Int) {
-        let hosts = visibleHosts
+        let hosts = navigableHosts
         guard !hosts.isEmpty else { selectedID = nil; return }
         let current = hosts.firstIndex { $0.id == selectedID }
         let next = current.map { min(max($0 + delta, 0), hosts.count - 1) } ?? (delta > 0 ? 0 : hosts.count - 1)
-        selectedID = hosts[next].id
+        let target = hosts[next]
+        selectedID = target.id
+        if query.isEmpty { expandOnlyGroup(containing: target) }
+    }
+
+    /// Accordion while arrow-browsing: expand just the group that holds the
+    /// selection, collapse the rest. (Searching expands everything anyway.)
+    private func expandOnlyGroup(containing host: SSHHost) {
+        guard let group = displayGroups.first(where: { g in g.hosts.contains { $0.id == host.id } }) else { return }
+        withAnimation(.easeInOut(duration: 0.15)) {
+            if group.name == favoritesGroupName {
+                favoritesExpanded = true
+                expandedGroups.removeAll()
+            } else {
+                favoritesExpanded = false
+                expandedGroups = [group.name]
+            }
+            singleGroupExpanded = true
+        }
     }
 
     private func connectSelected() {
-        let hosts = visibleHosts
-        if let host = hosts.first(where: { $0.id == selectedID }) ?? hosts.first {
+        let hosts = navigableHosts
+        if let host = hosts.first(where: { $0.id == selectedID }) {
             connect(host)
+        } else if !query.isEmpty, let first = hosts.first {
+            // Enter straight after typing connects the first match; on a fresh,
+            // collapsed menu with no selection it deliberately does nothing.
+            connect(first)
         }
     }
 

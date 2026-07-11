@@ -17,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let panelController = PanelController(state: state)
         panelController.onOpenSettings = { [weak self] in self?.showSettings() }
+        panelController.hasVisibleAuxWindow = { [weak self] in self?.settingsWindow?.isVisible ?? false }
         self.panelController = panelController
 
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -73,8 +74,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// accessory app (and varies across macOS versions).
     private func showSettings() {
         // Close the transient (floating) panel first, so Settings comes cleanly
-        // to the front regardless of entry point (gear, ⌘,, right-click).
-        panelController?.hide()
+        // to the front regardless of entry point (gear, ⌘,, right-click) —
+        // without handing focus away, since our own Settings window is next.
+        panelController?.hide(returnFocus: false)
         if settingsWindow == nil {
             let hosting = NSHostingView(rootView: SettingsView().environment(state))
             let window = NSWindow(
