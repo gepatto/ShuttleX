@@ -4,6 +4,11 @@ All notable changes to ShuttleX are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.4] - 2026-07-02
+
+### Fixed
+- Opening a connection as an iTerm2 **split** now focuses the new pane, so you can type into the new session right away — previously the previously active session kept the focus. (Windows and tabs already behaved correctly.)
+
 ## [1.14.3] - 2026-06-29
 
 ### Fixed
@@ -219,6 +224,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 ### Added
 - Initial release. A menu-bar SSH launcher built with SwiftUI (`MenuBarExtra`), pure arm64 for Apple Silicon. Hosts from `~/.ssh/config` or a JSON file; choose your terminal (Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm); open in a new window, tab, or split.
 
+[1.14.4]: https://github.com/DasDuo/ShuttleX/compare/v1.14.3...v1.14.4
 [1.14.3]: https://github.com/DasDuo/ShuttleX/compare/v1.14.2...v1.14.3
 [1.14.2]: https://github.com/DasDuo/ShuttleX/compare/v1.14.1...v1.14.2
 [1.14.1]: https://github.com/DasDuo/ShuttleX/compare/v1.14.0...v1.14.1

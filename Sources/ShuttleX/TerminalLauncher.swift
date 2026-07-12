@@ -173,6 +173,7 @@ enum TerminalLauncher {
                     end tell
                     tell newSession
                         write text "\(escaped)"
+                        select
                     end tell
                 end if
             end tell
