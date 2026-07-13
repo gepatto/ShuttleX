@@ -377,6 +377,7 @@ struct MenuView: View {
     }
 
     private func toggle(_ group: HostGroup) {
+        NSLog("ShuttleX: group header toggled (hosts=%d, wasExpanded=%d)", group.hosts.count, isExpanded(group) ? 1 : 0)
         withAnimation(.easeInOut(duration: 0.15)) {
             if group.name == favoritesGroupName {
                 favoritesExpanded = !isExpanded(group)

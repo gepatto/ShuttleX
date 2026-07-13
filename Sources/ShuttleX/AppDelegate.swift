@@ -76,7 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Close the transient (floating) panel first, so Settings comes cleanly
         // to the front regardless of entry point (gear, ⌘,, right-click) —
         // without handing focus away, since our own Settings window is next.
-        panelController?.hide(returnFocus: false)
+        panelController?.hide(returnFocus: false, reason: "open settings")
         if settingsWindow == nil {
             let hosting = NSHostingView(rootView: SettingsView().environment(state))
             let window = NSWindow(
@@ -98,6 +98,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Hide the panel when the user switches to another app (e.g. via ⌘-Tab).
     /// Picker menus inside the panel don't deactivate the app, so they're safe.
     func applicationDidResignActive(_ notification: Notification) {
-        panelController?.hide()
+        panelController?.hide(reason: "app resigned active")
     }
 }

@@ -79,7 +79,7 @@ final class PanelController {
 
         self.panel = panel
         self.hostingView = hostingView
-        self.panel.onCancel = { [weak self] in self?.hide() }
+        self.panel.onCancel = { [weak self] in self?.hide(reason: "esc") }
     }
 
     /// Where the panel appears — preserving both the classic menu-bar dropdown
@@ -94,14 +94,15 @@ final class PanelController {
     // MARK: - Visibility
 
     func toggle(anchor: Anchor) {
-        panel.isVisible ? hide() : show(anchor: anchor)
+        panel.isVisible ? hide(reason: "toggle") : show(anchor: anchor)
     }
 
     func show(anchor: Anchor) {
         showCount += 1
+        NSLog("ShuttleX: panel show (anchor=%@)", { if case .center = anchor { return "center" } else { return "statusItem" } }())
         hostingView.rootView = AnyView(
             MenuView(
-                onDismiss: { [weak self] in self?.hide() },
+                onDismiss: { [weak self] in self?.hide(reason: "menu dismiss") },
                 onOpenSettings: { [weak self] in self?.openSettings() }
             )
             .environment(state)
@@ -124,7 +125,9 @@ final class PanelController {
     /// active app (`NSApp.hide`) — without this, ShuttleX stays the active app
     /// with no window and keystrokes go nowhere (e.g. hotkey → Esc → typing).
     /// `returnFocus: false` is used when we're about to show our own Settings.
-    func hide(returnFocus: Bool = true) {
+    func hide(returnFocus: Bool = true, reason: String) {
+        // Diagnostic: which path closed the panel (visible in `log stream`).
+        NSLog("ShuttleX: panel hide (reason=%@, returnFocus=%d)", reason, returnFocus ? 1 : 0)
         removeOutsideClickMonitor()
         panel.orderOut(nil)
         if returnFocus, !hasVisibleAuxWindow() {
@@ -174,8 +177,13 @@ final class PanelController {
         // clicks inside the panel (and its picker menus) never dismiss it.
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown]
-        ) { [weak self] _ in
-            self?.hide()
+        ) { [weak self] event in
+            // Diagnostic: log where the "outside" click actually went — on managed
+            // Macs an invisible overlay window (endpoint tooling) can swallow
+            // clicks that visually land on our panel.
+            NSLog("ShuttleX: outside click observed (windowNumber=%d, location=%@)",
+                  event.windowNumber, NSStringFromPoint(event.locationInWindow))
+            self?.hide(reason: "outside click")
         }
     }
 

@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>ShuttleX</string>
 	<key>CFBundleExecutable</key>
 	<string>ShuttleX</string>
 	<key>CFBundleIconFile</key>
@@ -14,27 +16,25 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>ShuttleX</string>
-	<key>CFBundleDisplayName</key>
-	<string>ShuttleX</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.14.4</string>
+	<string>1.14.5</string>
 	<key>CFBundleVersion</key>
-	<string>38</string>
-	<key>ShuttleXChannel</key>
-	<string>stable</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>14.0</string>
-	<key>LSUIElement</key>
-	<true/>
+	<string>39</string>
 	<key>LSArchitecturePriority</key>
 	<array>
 		<string>arm64</string>
 	</array>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSUIElement</key>
+	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>ShuttleX controls your terminal app to open SSH connections.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 DasDuo</string>
+	<key>ShuttleXChannel</key>
+	<string>stable</string>
 </dict>
 </plist>

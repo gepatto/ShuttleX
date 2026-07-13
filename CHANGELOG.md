@@ -4,6 +4,11 @@ All notable changes to ShuttleX are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.5] - 2026-07-13
+
+### Changed
+- Added lightweight diagnostic logging around the panel (why it was shown/hidden, where an "outside" click landed, group-header toggles — no host names or other data). Visible via `log stream --predicate 'process == "ShuttleX"'`; helps debug machine-specific reports like the panel closing on click.
+
 ## [1.14.4] - 2026-07-02
 
 ### Fixed
@@ -224,6 +229,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 ### Added
 - Initial release. A menu-bar SSH launcher built with SwiftUI (`MenuBarExtra`), pure arm64 for Apple Silicon. Hosts from `~/.ssh/config` or a JSON file; choose your terminal (Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm); open in a new window, tab, or split.
 
+[1.14.5]: https://github.com/DasDuo/ShuttleX/compare/v1.14.4...v1.14.5
 [1.14.4]: https://github.com/DasDuo/ShuttleX/compare/v1.14.3...v1.14.4
 [1.14.3]: https://github.com/DasDuo/ShuttleX/compare/v1.14.2...v1.14.3
 [1.14.2]: https://github.com/DasDuo/ShuttleX/compare/v1.14.1...v1.14.2
