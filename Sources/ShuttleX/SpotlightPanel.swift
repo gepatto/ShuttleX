@@ -1,5 +1,11 @@
 import AppKit
+import os
 import SwiftUI
+
+/// Diagnostics around panel visibility. `.public` on purpose: plain NSLog is
+/// redacted to `<private>` in `log stream`, which made remote debugging blind.
+/// Logs reasons/coordinates only — never host names or user data.
+let panelLog = Logger(subsystem: "com.marek.ShuttleX", category: "panel")
 
 /// A floating panel that can become key (so the search field accepts typing)
 /// and closes on Esc. Used as the centered "Spotlight" window.
@@ -99,7 +105,8 @@ final class PanelController {
 
     func show(anchor: Anchor) {
         showCount += 1
-        NSLog("ShuttleX: panel show (anchor=%@)", { if case .center = anchor { return "center" } else { return "statusItem" } }())
+        let anchorName = { if case .center = anchor { return "center" } else { return "statusItem" } }()
+        panelLog.notice("panel show (anchor=\(anchorName, privacy: .public))")
         hostingView.rootView = AnyView(
             MenuView(
                 onDismiss: { [weak self] in self?.hide(reason: "menu dismiss") },
@@ -127,7 +134,7 @@ final class PanelController {
     /// `returnFocus: false` is used when we're about to show our own Settings.
     func hide(returnFocus: Bool = true, reason: String) {
         // Diagnostic: which path closed the panel (visible in `log stream`).
-        NSLog("ShuttleX: panel hide (reason=%@, returnFocus=%d)", reason, returnFocus ? 1 : 0)
+        panelLog.notice("panel hide (reason=\(reason, privacy: .public), returnFocus=\(returnFocus, privacy: .public))")
         removeOutsideClickMonitor()
         panel.orderOut(nil)
         if returnFocus, !hasVisibleAuxWindow() {
@@ -178,12 +185,18 @@ final class PanelController {
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown]
         ) { [weak self] event in
-            // Diagnostic: log where the "outside" click actually went — on managed
-            // Macs an invisible overlay window (endpoint tooling) can swallow
-            // clicks that visually land on our panel.
-            NSLog("ShuttleX: outside click observed (windowNumber=%d, location=%@)",
-                  event.windowNumber, NSStringFromPoint(event.locationInWindow))
-            self?.hide(reason: "outside click")
+            guard let self else { return }
+            // On managed Macs an invisible overlay window (endpoint tooling) can
+            // receive clicks that visually land on our panel — the global monitor
+            // then fires even though the user clicked *inside*. Judge by screen
+            // position, not by who got the event: inside the panel ⇒ never close.
+            let screenPoint = NSEvent.mouseLocation
+            if self.panel.frame.contains(screenPoint) {
+                panelLog.notice("outside click ignored — inside panel frame (windowNumber=\(event.windowNumber, privacy: .public))")
+                return
+            }
+            panelLog.notice("outside click (windowNumber=\(event.windowNumber, privacy: .public))")
+            self.hide(reason: "outside click")
         }
     }
 
