@@ -4,7 +4,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.15.0] - 2026-07-13
+## [1.15.0] - 2026-08-14
 
 ### Added
 - **Open a whole group, staggered**: right-click a group header and choose **"Open all N — staggered"** to open every server in the group one after another, spaced by a configurable delay (Settings → General → "Open-all stagger", default 2 s). The spacing keeps SSH-agent prompts (e.g. Secretive touch approvals) sequential instead of a burst. Note: ShuttleX can't detect when a session is fully established (ssh runs inside the terminal), so a fixed stagger is the honest approximation.
@@ -22,7 +22,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 ### Changed
 - Added lightweight diagnostic logging around the panel (why it was shown/hidden, where an "outside" click landed, group-header toggles — no host names or other data). Visible via `log stream --predicate 'process == "ShuttleX"'`; helps debug machine-specific reports like the panel closing on click.
 
-## [1.14.4] - 2026-07-02
+## [1.14.4] - 2026-07-12
 
 ### Fixed
 - Opening a connection as an iTerm2 **split** now focuses the new pane, so you can type into the new session right away — previously the previously active session kept the focus. (Windows and tabs already behaved correctly.)
