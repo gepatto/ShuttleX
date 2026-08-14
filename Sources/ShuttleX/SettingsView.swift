@@ -169,6 +169,13 @@ struct SettingsView: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
+                Stepper(value: $state.openAllInterval, in: 1...10, step: 1) {
+                    Text("Open-all stagger: \(Int(state.openAllInterval)) s")
+                }
+                Text("Delay between connections when you right-click a group and open all its servers — keeps SSH-agent prompts (e.g. Secretive) sequential instead of a burst.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+
                 Toggle("Check for updates on launch", isOn: $state.checkForUpdates)
                 Text("When on, ShuttleX checks the public GitHub Releases API (no account, no tracking) at most once a day and shows a hint in the menu. Off by default.")
                     .font(.callout)

@@ -51,6 +51,14 @@ final class AppState {
         didSet { UserDefaults.standard.set(tagsEnabled, forKey: "tagsEnabled") }
     }
 
+    /// Seconds between connections when opening a whole group. A stagger keeps
+    /// SSH-agent prompts (e.g. Secretive taps) sequential instead of a burst —
+    /// we can't detect "session established" (ssh runs inside the terminal), so
+    /// a fixed spacing is the honest approximation.
+    var openAllInterval: Double {
+        didSet { UserDefaults.standard.set(openAllInterval, forKey: "openAllInterval") }
+    }
+
     /// The mode actually used — falls back to "new window" when the selected
     /// terminal app doesn't support the chosen mode.
     var effectiveLaunchMode: LaunchMode {
@@ -110,6 +118,8 @@ final class AppState {
         defaultUser = defaults.string(forKey: "defaultUser") ?? ""
         remoteURL = defaults.string(forKey: "remoteURL") ?? ""
         tagsEnabled = defaults.bool(forKey: "tagsEnabled") // default false
+        let storedInterval = defaults.double(forKey: "openAllInterval")
+        openAllInterval = storedInterval > 0 ? storedInterval : 2.0
         checkForUpdates = defaults.bool(forKey: "checkForUpdates") // default false
         reload()
         maybeCheckForUpdates()
@@ -250,6 +260,17 @@ final class AppState {
             if favorites.contains(key) { favorites.remove(key) } else { favorites.insert(key) }
             RemoteFavorites.save(favorites)
             reload()
+        }
+    }
+
+    /// Opens every host in sequence, spaced by `openAllInterval`, so agent
+    /// prompts (Secretive & co.) arrive one at a time instead of as a burst.
+    func connectAll(_ hosts: [SSHHost]) {
+        panelLog.notice("open all (hosts=\(hosts.count, privacy: .public), interval=\(self.openAllInterval, privacy: .public))")
+        for (index, host) in hosts.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * openAllInterval) { [weak self] in
+                self?.connect(host)
+            }
         }
     }
 

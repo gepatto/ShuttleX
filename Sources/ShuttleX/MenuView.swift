@@ -159,7 +159,8 @@ struct MenuView: View {
                             GroupHeader(
                                 name: group.name,
                                 count: group.hosts.count,
-                                expanded: isExpanded(group)
+                                expanded: isExpanded(group),
+                                onOpenAll: group.hosts.count > 1 ? { openAll(group) } : nil
                             ) {
                                 toggle(group)
                             }
@@ -307,6 +308,14 @@ struct MenuView: View {
         selectedID = nil
     }
 
+    /// Opens every host of the group, staggered — see `AppState.connectAll`.
+    private func openAll(_ group: HostGroup) {
+        onDismiss()
+        state.connectAll(group.hosts)
+        query = ""
+        selectedID = nil
+    }
+
     // MARK: - Keyboard navigation
 
     /// Hosts the ↑/↓ keys step through: every host in display order, deduped —
@@ -402,6 +411,7 @@ private struct GroupHeader: View {
     let name: String
     let count: Int
     let expanded: Bool
+    var onOpenAll: (() -> Void)? = nil
     let action: () -> Void
 
     @State private var hovered = false
@@ -435,6 +445,15 @@ private struct GroupHeader: View {
                 .fill(hovered ? AnyShapeStyle(.quaternary.opacity(0.5)) : AnyShapeStyle(.clear))
         )
         .onHover { hovered = $0 }
+        .contextMenu {
+            if let onOpenAll {
+                Button {
+                    onOpenAll()
+                } label: {
+                    Label("Open all \(count) — staggered", systemImage: "square.stack.3d.down.right")
+                }
+            }
+        }
     }
 }
 

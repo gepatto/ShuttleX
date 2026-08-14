@@ -4,6 +4,11 @@ All notable changes to ShuttleX are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2026-07-13
+
+### Added
+- **Open a whole group, staggered**: right-click a group header and choose **"Open all N — staggered"** to open every server in the group one after another, spaced by a configurable delay (Settings → General → "Open-all stagger", default 2 s). The spacing keeps SSH-agent prompts (e.g. Secretive touch approvals) sequential instead of a burst. Note: ShuttleX can't detect when a session is fully established (ssh runs inside the terminal), so a fixed stagger is the honest approximation.
+
 ## [1.14.6] - 2026-07-13
 
 ### Fixed
@@ -237,6 +242,7 @@ All notable changes to ShuttleX are documented here. The format is based on
 ### Added
 - Initial release. A menu-bar SSH launcher built with SwiftUI (`MenuBarExtra`), pure arm64 for Apple Silicon. Hosts from `~/.ssh/config` or a JSON file; choose your terminal (Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm); open in a new window, tab, or split.
 
+[1.15.0]: https://github.com/DasDuo/ShuttleX/compare/v1.14.6...v1.15.0
 [1.14.6]: https://github.com/DasDuo/ShuttleX/compare/v1.14.5...v1.14.6
 [1.14.5]: https://github.com/DasDuo/ShuttleX/compare/v1.14.4...v1.14.5
 [1.14.4]: https://github.com/DasDuo/ShuttleX/compare/v1.14.3...v1.14.4
