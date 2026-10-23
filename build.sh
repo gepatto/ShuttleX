@@ -9,7 +9,8 @@ APP="build/ShuttleX.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-cp ".build/arm64-apple-macosx/release/ShuttleX" "$APP/Contents/MacOS/ShuttleX"
+#cp ".build/arm64-apple-macosx/release/ShuttleX" "$APP/Contents/MacOS/ShuttleX"
+cp ".build/release/ShuttleX" "$APP/Contents/MacOS/ShuttleX"
 cp "Resources/Info.plist" "$APP/Contents/Info.plist"
 
 # Pick the app icon by release channel so prerelease builds carry a BETA badge

@@ -5,6 +5,7 @@ import Foundation
 struct SSHHost: Identifiable, Hashable {
     let name: String
     let detail: String?
+    let profile: String?
     let command: String
     var favorite = false
     /// Stable host:port key for local (per-person) favorites on the remote

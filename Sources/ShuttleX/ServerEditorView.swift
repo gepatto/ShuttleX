@@ -163,6 +163,7 @@ struct EntryForm: View {
         var user = ""
         var host = ""
         var port = ""
+        var profile = ""
         var remoteCommand = ""
         var command = ""
         var rawMode = false
@@ -183,6 +184,7 @@ struct EntryForm: View {
             tags = (entry.tags ?? []).joined(separator: ", ")
             host = entry.host ?? ""
             port = entry.port.map(String.init) ?? ""
+            profile = entry.profile ?? "Default"
             remoteCommand = entry.remoteCommand ?? ""
             command = entry.command ?? ""
             rawMode = !(entry.command ?? "").isEmpty
@@ -274,6 +276,7 @@ struct EntryForm: View {
                         }
                         TextField("Host or IP", text: $model.host)
                         TextField("Port (optional)", text: $model.port)
+                        TextField("Profile (optional)", text: $model.profile)
                         TextField("Remote command (optional)", text: $model.remoteCommand)
                         Text("Leave the remote command empty for an interactive shell. If set, it runs on the server with a TTY (e.g. htop).")
                             .font(.callout)
@@ -328,6 +331,7 @@ struct EntryForm: View {
                 host: model.host.trimmingCharacters(in: .whitespaces),
                 user: user.isEmpty ? nil : user,
                 port: model.port.isEmpty ? nil : Int(model.port),
+                profile: model.profile.isEmpty ? nil : model.profile,
                 command: nil,
                 remoteCommand: remote.isEmpty ? nil : remote,
                 favorite: favorite, tags: tags

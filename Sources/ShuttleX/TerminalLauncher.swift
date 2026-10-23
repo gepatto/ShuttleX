@@ -37,12 +37,12 @@ enum TerminalLauncher {
         }
         let isRunning = NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == terminal.rawValue }
         let mode = effectiveMode(requested: requestedMode, supported: terminal.supportedModes, isRunning: isRunning)
-
+        let profile = host.profile ?? "Default"
         switch terminal {
         case .terminal:
             try runAppleScript(terminalScript(host.command, mode: mode, isRunning: isRunning), app: terminal.displayName)
         case .iterm2:
-            try runAppleScript(itermScript(host.command, mode: mode, isRunning: isRunning), app: terminal.displayName)
+            try runAppleScript(itermScript(host.command, profile: profile, mode: mode, isRunning: isRunning), app: terminal.displayName)
         case .warp:
             try launchWarp(host)
         case .ghostty:
@@ -108,10 +108,10 @@ enum TerminalLauncher {
         }
     }
 
-    private static func itermScript(_ command: String, mode: LaunchMode, isRunning: Bool) -> String {
+     private static func itermScript(_ command: String, profile:String, mode: LaunchMode, isRunning: Bool) -> String {
         let escaped = appleScriptEscaped(command)
         let newWindowBody = """
-                set newWindow to (create window with default profile)
+                set newWindow to (create window with profile "\(profile)")
                 tell current session of newWindow
                     write text "\(escaped)"
                 end tell
@@ -152,7 +152,7 @@ enum TerminalLauncher {
             \(newWindowBody)
                 else
                     tell current window
-                        set newTab to (create tab with default profile)
+                        set newTab to (create tab with profile "\(profile)")
                         tell current session of newTab
                             write text "\(escaped)"
                         end tell
@@ -169,7 +169,7 @@ enum TerminalLauncher {
             \(newWindowBody)
                 else
                     tell current session of current window
-                        set newSession to (split \(direction) with default profile)
+                        set newSession to (split \(direction) with profile "\(profile)")
                     end tell
                     tell newSession
                         write text "\(escaped)"

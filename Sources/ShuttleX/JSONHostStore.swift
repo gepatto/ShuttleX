@@ -20,6 +20,8 @@ enum JSONHostStore {
         var host: String?
         var user: String?
         var port: Int?
+        /// The name of a profile for iTerm2 for this host
+        var profile: String?
         /// A raw command run verbatim (overrides host/user/port) — e.g. jump hosts.
         var command: String?
         /// A command to run on the server, built on top of host/user/port (gets a TTY).
@@ -30,7 +32,7 @@ enum JSONHostStore {
         var tags: [String]?
 
         private enum CodingKeys: String, CodingKey {
-            case name, host, user, port, command, remoteCommand, favorite, tags
+            case name, host, user, port, profile, command, remoteCommand, favorite, tags
         }
     }
 
@@ -81,13 +83,14 @@ enum JSONHostStore {
         let tags = entry.tags ?? []
         // A raw command takes over completely — but never from a remote source.
         if allowCommands, let command = entry.command, !command.isEmpty {
-            return SSHHost(name: entry.name, detail: command, command: command,
+            return SSHHost(name: entry.name, detail: command, profile: entry.profile, command: command,
                            favorite: entry.favorite ?? false, tags: tags)
         }
 
         let host = entry.host ?? entry.name
         let serverKey = RemoteUserOverrides.key(host: host, port: entry.port)
         let override = userOverrides[serverKey]
+        let profile = entry.profile ?? "Default"
         // A favorite comes from the JSON entry (local source) or the local
         // per-person favorites set (remote source).
         let favorite = (entry.favorite ?? false) || favoriteKeys.contains(serverKey)
@@ -104,7 +107,7 @@ enum JSONHostStore {
         if let remote { parts.append(Shell.quote(remote)) }
 
         let detail = remote.map { "\(target): \($0)" } ?? target
-        return SSHHost(name: entry.name, detail: detail, command: parts.joined(separator: " "),
+        return SSHHost(name: entry.name, detail: detail, profile:profile, command: parts.joined(separator: " "),
                        favorite: favorite, favoriteKey: serverKey, tags: tags)
     }
 
